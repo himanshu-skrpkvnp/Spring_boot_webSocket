@@ -119,3 +119,4 @@ function getAvatarColor(messageSender) {
 
 usernameForm.addEventListener('submit', connect, true)
 messageForm.addEventListener('submit', send, true)
+chat.register
