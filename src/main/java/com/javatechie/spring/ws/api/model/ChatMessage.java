@@ -1,5 +1,12 @@
 package com.javatechie.spring.ws.api.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class ChatMessage {
 	private String content;
 	private String sender;
