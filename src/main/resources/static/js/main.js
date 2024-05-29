@@ -7,6 +7,7 @@ var messageForm = document.querySelector('#messageForm');
 var messageInput = document.querySelector('#message');
 var messageArea = document.querySelector('#messageArea');
 var connectingElement = document.querySelector('.connecting');
+var typingIndicatorElement = document.querySelector('#typing-indicator');
 
 var stompClient = null;
 var username = null;
@@ -19,7 +20,7 @@ var colors = [
 function connect(event) {
     username = document.querySelector('#name').value.trim();
 
-    if(username) {
+    if (username) {
         usernamePage.classList.add('hidden');
         chatPage.classList.remove('hidden');
 
@@ -31,50 +32,46 @@ function connect(event) {
     event.preventDefault();
 }
 
-
 function onConnected() {
-    // Subscribe to the Public Topic
     stompClient.subscribe('/topic/public', onMessageReceived);
+    stompClient.subscribe('/topic/typing', onTypingReceived);
 
-    // Tell your username to the server
     stompClient.send("/app/chat.register",
         {},
         JSON.stringify({sender: username, type: 'JOIN'})
-    )
+    );
 
     connectingElement.classList.add('hidden');
 }
-
 
 function onError(error) {
     connectingElement.textContent = 'Could not connect to WebSocket server. Please refresh this page to try again!';
     connectingElement.style.color = 'red';
 }
 
-
 function send(event) {
     var messageContent = messageInput.value.trim();
 
-    if(messageContent && stompClient) {
+    if (messageContent && stompClient) {
         var chatMessage = {
             sender: username,
-            content: messageInput.value,
+            content: messageContent,
             type: 'CHAT'
         };
 
         stompClient.send("/app/chat.send", {}, JSON.stringify(chatMessage));
         messageInput.value = '';
+        sendTypingIndicator(false);
     }
     event.preventDefault();
 }
-
 
 function onMessageReceived(payload) {
     var message = JSON.parse(payload.body);
 
     var messageElement = document.createElement('li');
 
-    if(message.type === 'JOIN') {
+    if (message.type === 'JOIN') {
         messageElement.classList.add('event-message');
         message.content = message.sender + ' joined!';
     } else if (message.type === 'LEAVE') {
@@ -106,6 +103,14 @@ function onMessageReceived(payload) {
     messageArea.scrollTop = messageArea.scrollHeight;
 }
 
+function onTypingReceived(payload) {
+    var typingIndicator = JSON.parse(payload.body);
+    if (typingIndicator.typing) {
+        typingIndicatorElement.textContent = typingIndicator.sender + ' is typing...';
+    } else {
+        typingIndicatorElement.textContent = '';
+    }
+}
 
 function getAvatarColor(messageSender) {
     var hash = 0;
@@ -117,6 +122,23 @@ function getAvatarColor(messageSender) {
     return colors[index];
 }
 
+function sendTypingIndicator(isTyping) {
+    if (stompClient) {
+        var typingIndicator = {
+            sender: username,
+            typing: isTyping
+        };
+        stompClient.send("/app/typing", {}, JSON.stringify(typingIndicator));
+    }
+}
+
+messageInput.addEventListener('input', function() {
+    sendTypingIndicator(true);
+});
+
+messageInput.addEventListener('blur', function() {
+    sendTypingIndicator(false);
+});
+
 usernameForm.addEventListener('submit', connect, true)
 messageForm.addEventListener('submit', send, true)
-chat.register

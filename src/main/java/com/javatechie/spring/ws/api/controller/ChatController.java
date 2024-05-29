@@ -1,5 +1,6 @@
 package com.javatechie.spring.ws.api.controller;
 
+import com.javatechie.spring.ws.api.model.TypingIndicator;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -22,6 +23,12 @@ public class ChatController {
 	@SendTo("/topic/public")
 	public ChatMessage sendMessage(@Payload ChatMessage chatMessage) {
 		return chatMessage;
+	}
+
+	@MessageMapping("/typing")
+	@SendTo("/topic/typing")
+	public TypingIndicator typing( TypingIndicator typingIndicator) {
+		return  typingIndicator ;
 	}
 
 }

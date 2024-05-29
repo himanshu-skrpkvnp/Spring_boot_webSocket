@@ -20,8 +20,6 @@ body {
    /*  background-color: #f4f4f4; */
     height: 100%;
 
-
-
   /* Center and scale the image nicely */
   background-position: center;
   background-repeat: no-repeat;
@@ -138,7 +136,6 @@ button.accent {
 .username-page-container .username-submit {
     margin-top: 10px;
 }
-
 
 #chat-page {
     position: relative;
@@ -257,9 +254,15 @@ button.accent {
     width: 100%;
 }
 
+/* Typing indicator styles */
+.typing-indicator {
+    height: 20px;
+    margin: 10px 0;
+    color: #888;
+    font-style: italic;
+}
 
 @media screen and (max-width: 730px) {
-
     .chat-container {
         margin-left: 10px;
         margin-right: 10px;
